@@ -222,7 +222,7 @@ ws.on('open', () => {
         console.error('⚠️ Error al enviar al Webhook:', error.message);
       }
     }
-  }, 5000); // ⚠️ Para pruebas podés poner 5000 ms
+  }, 1800000); // ⚠️ Para pruebas podés poner 5000 ms
 });
 
 ws.on('message', (message) => console.log('📥 Mensaje del WS Server:', message.toString()));
