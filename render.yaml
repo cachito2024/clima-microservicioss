@@ -7,7 +7,7 @@ services:
     startCommand: "node rest-api-db.js"
     envVars:
       - key: MONGO_URI
-        sync: false
+        value: mongodb+srv://antonella:1234@cluster0.qxz4vxb.mongodb.net/Clima?retryWrites=true&w=majority&appName=Cluster0
       - key: REST_API_URL
         value: https://rest-api-db.onrender.com/temperatura_api
 
@@ -21,17 +21,7 @@ services:
       - key: REST_API_URL
         value: https://rest-api-db.onrender.com/temperatura_api
       - key: WEBHOOK_URL
-        value: https://webhook.onrender.com/webhook
-
-  - type: web  # ⚠️ cambiar de worker a web
-    name: ws-client
-    env: node
-    plan: free
-    buildCommand: "npm install"
-    startCommand: "node ws-client.js"
-    envVars:
-      - key: WS_SERVER_URL
-        value: wss://ws-server.onrender.com
+        value: https://webhook-k8gk.onrender.com/webhook
 
   - type: web
     name: ws-server
@@ -41,4 +31,16 @@ services:
     startCommand: "node ws-server.js"
     envVars:
       - key: WEBHOOK_URL
-        value: https://webhook.onrender.com/webhook
+        value: https://webhook-k8gk.onrender.com/webhook
+
+  - type: web
+    name: ws-client
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node ws-client.js"
+    envVars:
+      - key: WS_SERVER_URL
+        value: wss://ws-server-pa1h.onrender.com
+      - key: WEBHOOK_URL
+        value: https://webhook-k8gk.onrender.com/webhook
