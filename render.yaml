@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: rest-api-db
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node rest-api-db.js"
+    envVars:
+      - key: MONGO_URI
+        sync: false  # la seteás en el panel de Render
+      - key: REST_API_URL
+        value: https://rest-api-db.onrender.com/temperatura_api
+
+  - type: web
+    name: webhook
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node webhook-server.js"
+    envVars:
+      - key: REST_API_URL
+        value: https://rest-api-db.onrender.com/temperatura_api
+      - key: WEBHOOK_URL
+        value: https://webhook.onrender.com/webhook
+
+  - type: worker
+    name: ws-client
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node ws-client.js"
+    envVars:
+      - key: WS_SERVER_URL
+        value: wss://ws-server.onrender.com
+
+  - type: web
+    name: ws-server
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node ws-server.js"
+    envVars:
+      - key: WEBHOOK_URL
+        value: https://webhook.onrender.com/webhook
