@@ -87,7 +87,7 @@ ws.on('close', () => console.log('❌ Conexión cerrada'));
 ws.on('error', (err) => console.error('⚠️ Error en WebSocket:', err.message));
  */
 
-// ws-client.js con api open-meteo
+/* // ws-client.js con api open-meteo
 require('dotenv').config();
 const WebSocket = require('ws');
 const axios = require('axios');
@@ -100,7 +100,7 @@ const WS_SERVER_URL = process.env.WS_SERVER_URL;
   : 'ws://localhost:8088';     // URL local para pruebas */
 
 // Ciudades a medir con sus coordenadas
-const cities = [
+/* const cities = [
   { name: 'Shangai', lat: 31.2304, lon: 121.4737 },
   { name: 'Berlin', lat: 52.5200, lon: 13.4050 },
   { name: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 }
@@ -154,4 +154,77 @@ ws.on('message', (message) => {
 });
 
 ws.on('close', () => console.log('❌ Conexión cerrada'));
-ws.on('error', (err) => console.error('⚠️ Error en WebSocket:', err.message));
+ws.on('error', (err) => console.error('⚠️ Error en WebSocket:', err.message)); */
+
+//MODD RENDERR
+require('dotenv').config();
+const WebSocket = require('ws');
+const axios = require('axios');
+const http = require('http');
+
+// Usamos el puerto que Render asigna, o un puerto local para pruebas
+const PORT = process.env.PORT || 3001;
+
+// Creamos un server HTTP mínimo para que Render acepte el servicio
+const server = http.createServer();
+server.listen(PORT, () => console.log(`🟢 ws-client corriendo en puerto ${PORT}`));
+
+// URL del WebSocket Server y Webhook
+const WS_SERVER_URL = process.env.WS_SERVER_URL;
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
+
+// Ciudades a medir con sus coordenadas
+const cities = [
+  { name: 'Shangai', lat: 31.2304, lon: 121.4737 },
+  { name: 'Berlin', lat: 52.5200, lon: 13.4050 },
+  { name: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 }
+];
+
+// Función que consulta la API de Open-Meteo
+async function fetchTemperatures() {
+  const timestamp = new Date().toISOString();
+
+  const requests = cities.map(async (city) => {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`;
+      const response = await axios.get(url);
+      const temperature = response.data.current_weather.temperature;
+
+      return { city: city.name, temperature, timestamp };
+    } catch (err) {
+      console.error(`⚠️ Error obteniendo datos de ${city.name}:`, err.message);
+      return null;
+    }
+  });
+
+  const results = await Promise.all(requests);
+  return results.filter(r => r !== null);
+}
+
+// Conectamos al WebSocket Server
+const ws = new WebSocket(WS_SERVER_URL);
+
+ws.on('open', () => {
+  console.log('✅ Conectado al WS Server');
+
+  // Cada 30 minutos (1800000 ms) → consulta real
+  setInterval(async () => {
+    const tempData = await fetchTemperatures();
+    if (tempData.length > 0) {
+      ws.send(JSON.stringify(tempData));
+      console.log('📤 Enviado:', tempData);
+
+      // También al Webhook
+      try {
+        await axios.post(WEBHOOK_URL, tempData);
+        console.log('📤 Datos enviados al Webhook');
+      } catch (error) {
+        console.error('⚠️ Error al enviar al Webhook:', error.message);
+      }
+    }
+  }, 1800000); // ⚠️ Para pruebas podés poner 5000 ms
+});
+
+ws.on('message', (message) => console.log('📥 Mensaje del WS Server:', message.toString()));
+ws.on('close', () => console.log('❌ Conexión cerrada'));
+ws.on('error', (err) => console.error('⚠️ Error en WS:', err.message));
