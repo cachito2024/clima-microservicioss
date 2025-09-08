@@ -2,6 +2,7 @@ services:
   - type: web
     name: rest-api-db
     env: node
+    healthCheckPath: /health
     plan: free
     buildCommand: "npm install"
     startCommand: "node rest-api-db.js"
@@ -14,6 +15,7 @@ services:
   - type: web
     name: webhook
     env: node
+    healthCheckPath: /health
     plan: free
     buildCommand: "npm install"
     startCommand: "node webhook-server.js"
@@ -27,6 +29,7 @@ services:
     name: ws-server
     env: node
     plan: free
+    healthCheckPath: /health
     buildCommand: "npm install"
     startCommand: "node ws-server.js"
     envVars:
@@ -36,6 +39,7 @@ services:
   - type: web
     name: ws-client
     env: node
+    healthCheckPath: /health
     plan: free
     buildCommand: "npm install"
     startCommand: "node ws-client.js"
