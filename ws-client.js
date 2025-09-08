@@ -240,7 +240,17 @@ const http = require('http');
 const PORT = process.env.PORT || 3001;
 
 // Creamos un server HTTP mínimo para que Render acepte el servicio
-const server = http.createServer();
+const server = http.createServer((req, res) => {
+  // Health check
+  if (req.url === '/health') {
+    res.writeHead(200);
+    res.end('OK');
+    return;
+  }
+  res.writeHead(404);
+  res.end();
+});
+
 server.listen(PORT, () => console.log(`🟢 ws-client corriendo en puerto ${PORT}`));
 
 // URL del WebSocket Server y Webhook

@@ -96,14 +96,26 @@ wss.on('connection', (ws) => {
 require('dotenv').config();
 const WebSocket = require('ws');
 const axios = require('axios');
+const express = require('express');
+
+const app = express();
+
+// Health check para Render
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 // Usar el puerto que Render asigna
-const WS_PORT = process.env.PORT || 8088;
+const PORT = process.env.PORT || 8088;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
-const wss = new WebSocket.Server({ port: WS_PORT }, () => {
-  console.log(`✅ WebSocket Server corriendo en ws://localhost:${WS_PORT}`);
+// Crear servidor HTTP a partir de Express
+const server = app.listen(PORT, () => {
+  console.log(`✅ Servidor HTTP corriendo en http://localhost:${PORT}`);
 });
+
+// Crear WebSocket usando el mismo servidor
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
   console.log('🔗 Cliente conectado');

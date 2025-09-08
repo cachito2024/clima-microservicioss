@@ -75,6 +75,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+// Health check para Render
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // 🔗 Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -124,6 +129,7 @@ app.get('/temperatura_api', async (req, res) => {
 });
 
 // Servidor
-app.listen(4000, () => {
-  console.log('✅ REST API escuchando en http://localhost:4000');
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`✅ REST API escuchando en http://localhost:${PORT}`);
 });

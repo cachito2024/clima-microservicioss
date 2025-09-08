@@ -32,6 +32,12 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
+// Health check para Render
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// Endpoint principal del Webhook
 app.post('/webhook', async (req, res) => {
   console.log('📥 Webhook recibió datos:', req.body);
 
@@ -45,6 +51,8 @@ app.post('/webhook', async (req, res) => {
   res.status(200).send({ message: '✅ Webhook procesó los datos correctamente' });
 });
 
-app.listen(3000, () => {
-  console.log('✅ Webhook escuchando en http://localhost:3000/webhook');
+// Usar el puerto asignado por Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Webhook escuchando en http://localhost:${PORT}/webhook`);
 });
