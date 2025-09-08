@@ -7,7 +7,7 @@ services:
     startCommand: "node rest-api-db.js"
     envVars:
       - key: MONGO_URI
-        sync: false  # la seteás en el panel de Render
+        sync: false
       - key: REST_API_URL
         value: https://rest-api-db.onrender.com/temperatura_api
 
@@ -23,7 +23,7 @@ services:
       - key: WEBHOOK_URL
         value: https://webhook.onrender.com/webhook
 
-  - type: worker
+  - type: web  # ⚠️ cambiar de worker a web
     name: ws-client
     env: node
     plan: free
