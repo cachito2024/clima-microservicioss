@@ -92,8 +92,12 @@ require('dotenv').config();
 const WebSocket = require('ws');
 const axios = require('axios');
 
-// URL de tu WebSocket Server
-const WS_SERVER_URL = process.env.WS_SERVER_URL;
+ // URL de tu WebSocket Server
+const WS_SERVER_URL = process.env.WS_SERVER_URL; 
+// Detectar si estamos en Render o en local
+/* const WS_SERVER_URL = process.env.RENDER
+  ? process.env.WS_SERVER_URL  // URL pública en Render
+  : 'ws://localhost:8088';     // URL local para pruebas */
 
 // Ciudades a medir con sus coordenadas
 const cities = [

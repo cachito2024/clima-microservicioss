@@ -51,11 +51,54 @@ wss.on('connection', (ws) => {
   });
 });
  */
-require('dotenv').config();
+/* require('dotenv').config();
 const WebSocket = require('ws');
 const axios = require('axios');
 
 const WS_PORT = 8088;
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
+
+const wss = new WebSocket.Server({ port: WS_PORT }, () => {
+  console.log(`✅ WebSocket Server corriendo en ws://localhost:${WS_PORT}`);
+});
+
+wss.on('connection', (ws) => {
+  console.log('🔗 Cliente conectado');
+
+  ws.on('message', async (message) => {
+    console.log('📥 Datos recibidos del cliente:', message.toString());
+
+    let newData;
+    try {
+      newData = JSON.parse(message.toString());
+    } catch (err) {
+      console.error('⚠️ Error parseando JSON:', err);
+      return;
+    }
+
+    // Reenviar directamente al Webhook
+    try {
+      await axios.post(WEBHOOK_URL, newData);
+      console.log('📤 Datos reenviados al Webhook');
+      ws.send('✅ Datos enviados correctamente al Webhook');
+    } catch (error) {
+      console.error('⚠️ Error al enviar al Webhook:', error.message);
+      ws.send('⚠️ Error al enviar al Webhook');
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('❌ Cliente desconectado');
+  });
+});
+ */
+//MODIF RENDER.. 
+require('dotenv').config();
+const WebSocket = require('ws');
+const axios = require('axios');
+
+// Usar el puerto que Render asigna
+const WS_PORT = process.env.PORT || 8088;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
 const wss = new WebSocket.Server({ port: WS_PORT }, () => {
