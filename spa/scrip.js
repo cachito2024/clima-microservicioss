@@ -1,11 +1,59 @@
-// Función para obtener datos del backend (REST API punto 4)
+const loginContainer = document.getElementById('loginContainer');
+const chartsContainer = document.getElementById('chartsContainer');
+const loginForm = document.getElementById('loginForm');
+const errorP = document.getElementById('error');
+const filtroCiudad = document.getElementById('filtroCiudad'); // filtro
+let chart; // referencia al gráfico
+let datosCompletos = []; // para filtrar sin volver a fetch
+
+// ===== LOGIN =====
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    // 🔹 Login local
+    const res = await fetch('http://localhost:7000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!res.ok) throw new Error('Usuario o contraseña incorrectos');
+
+    const data = await res.json();
+    localStorage.setItem('token', data.token);
+
+    // Mostrar la sección de gráficos
+    loginContainer.style.display = 'none';
+    chartsContainer.style.display = 'block';
+    crearGrafico(); 
+    setInterval(crearGrafico, 5000);
+
+  } catch (err) {
+    errorP.textContent = err.message;
+  }
+});
+
+// ===== FUNCIONES PARA GRÁFICO =====
 async function fetchTemperaturas() {
-  const response = await fetch('http://localhost:4000/temperaturas');
+  const token = localStorage.getItem('token');
+
+  // 🔹 Fetch desde REST API en Render
+  const response = await fetch('https://rest-api-db.onrender.com/temperatura_api', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al obtener datos. ¿Tu token expiró?');
+  }
+
   const data = await response.json();
   return data;
 }
 
-// Prepara los datasets para Chart.js
+// Preparar datasets para Chart.js
 function prepararDatos(data) {
   const cities = ['Shangai', 'Berlin', 'Rio de Janeiro'];
   const colores = {
@@ -22,47 +70,93 @@ function prepararDatos(data) {
     borderColor: colores[city],
     fill: false,
     tension: 0.1
-  }));
+  })).filter(ds => ds.data.length > 0); // solo datasets con datos
 }
 
-let chart; // guardamos la referencia al gráfico
+// Actualizar KPIs
+function actualizarKPIs(data) {
+  const total = data.length;
+  const shangai = data.filter(d => d.city === 'Shangai').length;
+  const berlin = data.filter(d => d.city === 'Berlin').length;
+  const rio = data.filter(d => d.city === 'Rio de Janeiro').length;
+
+  const temperaturas = data.map(d => d.temperature);
+  const tempMax = temperaturas.length ? Math.max(...temperaturas) : 0;
+  const tempMin = temperaturas.length ? Math.min(...temperaturas) : 0;
+
+  document.getElementById('totalDatos').textContent = total;
+  document.getElementById('totalShangai').textContent = shangai;
+  document.getElementById('totalBerlin').textContent = berlin;
+  document.getElementById('totalRio').textContent = rio;
+  document.getElementById('tempMax').textContent = tempMax;
+  document.getElementById('tempMin').textContent = tempMin;
+}
 
 // Crear o actualizar gráfico
 async function crearGrafico() {
-  const data = await fetchTemperaturas();
-  const datasets = prepararDatos(data);
+  try {
+    const data = await fetchTemperaturas();
+    datosCompletos = data; // guardamos todo
 
-  const ctx = document.getElementById('tempChart').getContext('2d');
+    const ciudadSeleccionada = filtroCiudad.value;
+    const dataFiltrada = ciudadSeleccionada === 'all'
+      ? data
+      : data.filter(d => d.city === ciudadSeleccionada);
 
-  if (chart) {
-    // Si ya existe, actualizamos datasets
-    chart.data.datasets = datasets;
-    chart.update();
-  } else {
-    // Si no existe, lo creamos
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: { datasets },
-      options: {
-        parsing: {
-          xAxisKey: 'x',
-          yAxisKey: 'y'
-        },
-        scales: {
-          x: { 
-            type: 'time',
-            time: { unit: 'minute', tooltipFormat: 'yyyy-MM-dd HH:mm' },
-            title: { display: true, text: 'Fecha / Hora (UTC)' }
-          },
-          y: { 
-            title: { display: true, text: 'Temperatura (°C)' } 
+    // 🔹 KPIs según filtro
+    actualizarKPIs(dataFiltrada);
+
+    const datasets = prepararDatos(dataFiltrada);
+    const ctx = document.getElementById('tempChart').getContext('2d');
+
+    if (chart) {
+      chart.data.datasets = datasets;
+      chart.update();
+    } else {
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: 'minute', tooltipFormat: 'yyyy-MM-dd HH:mm' },
+              title: { display: true, text: 'Fecha / Hora (UTC)' }
+            },
+            y: { title: { display: true, text: 'Temperatura (°C)' } }
           }
         }
-      }
-    });
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
 }
 
-// Ejecutar al cargar y refrescar cada 5s
-crearGrafico();
-setInterval(crearGrafico, 5000);
+// ===== FILTRO =====
+filtroCiudad.addEventListener('change', () => {
+  crearGrafico(); // usa datosCompletos y aplica filtro
+});
+
+// ===== AUTOLOGIN SI YA HAY TOKEN =====
+function isTokenValid(token) {
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp > now;
+  } catch {
+    return false;
+  }
+}
+
+const savedToken = localStorage.getItem('token');
+if (isTokenValid(savedToken)) {
+  loginContainer.style.display = 'none';
+  chartsContainer.style.display = 'block';
+  crearGrafico();
+  setInterval(crearGrafico, 5000);
+} else {
+  localStorage.removeItem('token'); // borrar token expirado
+}

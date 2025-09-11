@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <title>Temperaturas</title>
+  <title>Temperaturas con Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>Temperaturas por Ciudad</h1>
-  <canvas id="tempChart" width="800" height="400"></canvas>
+  <!-- ===== LOGIN ===== -->
+  <div id="loginContainer" class="login-container">
+  <h2 class="login-title">Iniciar Sesión</h2>
+  <form id="loginForm" class="login-form">
+    <div class="input-group">
+      <label for="username">Usuario</label>
+      <input type="text" id="username" placeholder="Escribe tu usuario" required>
+    </div>
+    <div class="input-group">
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="Escribe tu contraseña" required>
+    </div>
+    <button type="submit" class="btn-login">Entrar</button>
+    <p id="error" class="error"></p>
+  </form>
+</div>
+
+
+  <!-- ===== KPIS Y GRÁFICO ===== -->
+  <div id="chartsContainer" style="display:none;">
+    <h1>Temperaturas por Ciudad</h1>
+
+    <!-- KPIs en recuadros -->
+    <div id="kpis" class="kpis-container">
+      <div class="kpi-card">Total datos: <b id="totalDatos">0</b></div>
+      <div class="kpi-card">Shangai: <b id="totalShangai">0</b></div>
+      <div class="kpi-card">Berlin: <b id="totalBerlin">0</b></div>
+      <div class="kpi-card">Rio de Janeiro: <b id="totalRio">0</b></div>
+      <div class="kpi-card">Max: <b id="tempMax">0</b>°C</div>
+      <div class="kpi-card">Min: <b id="tempMin">0</b>°C</div>
+    </div>
+
+    <!-- Filtro ciudad -->
+<div id="filtro" class="filtro-container">
+  <label for="filtroCiudad">Filtrar ciudad:</label>
+  <select id="filtroCiudad">
+    <option value="all">Todas</option>
+    <option value="Shangai">Shangai</option>
+    <option value="Berlin">Berlin</option>
+    <option value="Rio de Janeiro">Rio de Janeiro</option>
+  </select>
+</div>
+
+    <!-- Gráfico -->
+    <canvas id="tempChart" width="800" height="400"></canvas>
+  </div>
 
   <!-- Librerías necesarias -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,6 +61,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
 
   <!-- Tu script -->
-  <script src="scrip.js"></script>
+  <script src="./scrip.js"></script>
 </body>
+
 </html>
