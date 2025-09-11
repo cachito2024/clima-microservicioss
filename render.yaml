@@ -48,3 +48,14 @@ services:
         value: wss://ws-server-pa1h.onrender.com
       - key: WEBHOOK_URL
         value: https://webhook-k8gk.onrender.com/webhook
+
+  - type: web
+    name: auth
+    env: node
+    healthCheckPath: /health
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node auth.js"
+    envVars:
+      - key: JWT_SECRET
+        value: miclavesupersegura

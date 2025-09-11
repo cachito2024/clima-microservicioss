@@ -29,7 +29,7 @@ loginForm.addEventListener('submit', async (e) => {
     loginContainer.style.display = 'none';
     chartsContainer.style.display = 'block';
     crearGrafico(); 
-    setInterval(crearGrafico, 5000);
+    setInterval(crearGrafico, 1000000);
 
   } catch (err) {
     errorP.textContent = err.message;
@@ -156,7 +156,7 @@ if (isTokenValid(savedToken)) {
   loginContainer.style.display = 'none';
   chartsContainer.style.display = 'block';
   crearGrafico();
-  setInterval(crearGrafico, 5000);
+  setInterval(crearGrafico, 1000000);
 } else {
   localStorage.removeItem('token'); // borrar token expirado
 }

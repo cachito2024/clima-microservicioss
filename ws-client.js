@@ -373,7 +373,7 @@ server.listen(PORT, () => console.log(`🟢 ws-client corriendo en puerto ${PORT
 // JWT del usuario (dummy login)
 function getToken() {
   // Aquí podés reemplazar por login real a tu REST API
-  return jwt.sign({ user: "ws-client" }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ user: "ws-client" }, process.env.JWT_SECRET, { expiresIn: "20d" });
 }
 
 const token = getToken();

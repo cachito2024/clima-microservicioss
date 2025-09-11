@@ -199,3 +199,29 @@ canvas#tempChart {
   color: #e74c3c;
   font-size: 14px;
 }
+
+
+
+/* Contenedor del título de gráficos */
+.title-container {
+  display: inline-block;          /* ajusta ancho al contenido */
+  padding: 20px 40px;             /* espacio interno, similar al login */
+  background: #ffffffa1;          /* fondo semi-transparente */
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  margin-bottom: 25px;            /* espacio con KPIs */
+  backdrop-filter: blur(6px);
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Título dentro del contenedor */
+.charts-title {
+  font-size: 28px;
+  font-weight: bold;
+  background: linear-gradient(45deg, #215cff, #af06fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  margin: 0;
+}

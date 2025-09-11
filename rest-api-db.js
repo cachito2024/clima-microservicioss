@@ -185,7 +185,7 @@ function authenticateToken(req, res, next) {
 // ====== RUTAS PROTEGIDAS ======
 
 // POST
-app.post('/temperatura_api', authenticateToken, async (req, res) => {
+app.post('/temperatura_api', /*  authenticateToken, */  async (req, res) => {
   try {
     const newData = req.body;
     console.log('📥 REST API POST recibido:', newData);

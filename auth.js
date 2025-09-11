@@ -8,11 +8,12 @@ const app = express();
 app.use(express.json());
 app.use(cors()); // <- agregar
 
-/* // ===== RUTA DE SALUD =====
+// ===== RUTA DE SALUD =====
 // Usala en UptimeRobot para que Render no lo "duerma"
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'auth-service' });
-}); */
+}); 
+
 // Endpoint de login
 app.post("/login", (req, res) => {
   const { username, password } = req.body;

@@ -58,7 +58,7 @@ app.listen(PORT, () => {
 });
  */
 //CON JWT
-require('dotenv').config();
+/* require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -72,23 +72,9 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// Middleware para autenticar JWT
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401);
 
-  try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = user; // queda disponible como req.user
-    next();
-  } catch (err) {
-    return res.sendStatus(403);
-  }
-}
-
-// Endpoint principal del Webhook con JWT
-app.post('/webhook', authenticateToken, async (req, res) => {
+// Endpoint principal del Webhook 
+app.post('/webhook',    async (req, res) => {
   console.log('📥 Webhook recibió datos:', req.body);
 
   try {
@@ -103,6 +89,59 @@ app.post('/webhook', authenticateToken, async (req, res) => {
   }
 
   res.status(200).send({ message: '✅ Webhook procesó los datos correctamente' });
+});
+
+// Usar el puerto asignado por Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Webhook escuchando en http://localhost:${PORT}/webhook`);
+});
+ */
+
+//moddd para auth
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Health check para Render
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// Endpoint principal del Webhook 
+app.post('/webhook', async (req, res) => {
+  console.log('📥 Webhook recibió datos:', req.body);
+
+  // Obtener token del header de manera segura
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No se proporcionó token" });
+  }
+
+  // Opcional: verificar token localmente si querés (no necesario si REST API lo valida)
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(403).json({ error: "Token inválido" });
+  }
+
+  try {
+    const response = await axios.post(process.env.REST_API_URL, req.body, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('📤 Webhook → REST API:', response.data);
+    res.status(200).json({ message: '✅ Webhook procesó los datos correctamente' });
+  } catch (err) {
+    console.error('⚠️ Error reenviando al REST API:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Error al reenviar al REST API', details: err.message });
+  }
 });
 
 // Usar el puerto asignado por Render
