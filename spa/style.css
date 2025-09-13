@@ -17,7 +17,7 @@ h1 {
   font-weight: bold;
   position: relative;
   display: inline-block;
-  background: linear-gradient(45deg, #1c0486, #1dfab0);
+ /*  background: linear-gradient(45deg, #1c0486, #1dfab0); */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
  /*  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0); */

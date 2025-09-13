@@ -10,27 +10,27 @@
 <body>
   <!-- ===== LOGIN ===== -->
   <div id="loginContainer" class="login-container">
-  <h2 class="login-title">Iniciar Sesión</h2>
-  <form id="loginForm" class="login-form">
-    <div class="input-group">
-      <label for="username">Usuario</label>
-      <input type="text" id="username" placeholder="Escribe tu usuario" required>
-    </div>
-    <div class="input-group">
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" placeholder="Escribe tu contraseña" required>
-    </div>
-    <button type="submit" class="btn-login">Entrar</button>
-    <p id="error" class="error"></p>
-  </form>
-</div>
+    <h2 class="login-title">Iniciar Sesión</h2>
+    <form id="loginForm" class="login-form">
+      <div class="input-group">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" placeholder="Escribe tu usuario" required>
+      </div>
+      <div class="input-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="Escribe tu contraseña" required>
+      </div>
+      <button type="submit" class="btn-login">Entrar</button>
+      <p id="error" class="error"></p>
+    </form>
+  </div>
 
 
   <!-- ===== KPIS Y GRÁFICO ===== -->
   <div id="chartsContainer" style="display:none;">
     <div class="title-container">
-  <h1 class="charts-title">Temperaturas por Ciudad</h1>
-</div>
+      <h1 class="charts-title">Temperaturas por Ciudad</h1>
+    </div>
 
     <!-- KPIs en recuadros -->
     <div id="kpis" class="kpis-container">
@@ -43,26 +43,25 @@
     </div>
 
     <!-- Filtro ciudad -->
-<div id="filtro" class="filtro-container">
-  <label for="filtroCiudad">Filtrar ciudad:</label>
-  <select id="filtroCiudad">
-    <option value="all">Todas</option>
-    <option value="Shangai">Shangai</option>
-    <option value="Berlin">Berlin</option>
-    <option value="Rio de Janeiro">Rio de Janeiro</option>
-  </select>
-</div>
+    <div id="filtro" class="filtro-container">
+      <label for="filtroCiudad">Filtrar ciudad:</label>
+      <select id="filtroCiudad">
+        <option value="all">Todas</option>
+        <option value="Shangai">Shangai</option>
+        <option value="Berlin">Berlin</option>
+        <option value="Rio de Janeiro">Rio de Janeiro</option>
+      </select>
+    </div>
 
     <!-- Gráfico -->
     <canvas id="tempChart" width="800" height="400"></canvas>
   </div>
 
-  <!-- Librerías necesarias -->
+  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
 
-  <!-- Tu script -->
   <script src="./scrip.js"></script>
 </body>
 

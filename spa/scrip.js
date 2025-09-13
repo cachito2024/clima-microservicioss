@@ -2,19 +2,19 @@ const loginContainer = document.getElementById('loginContainer');
 const chartsContainer = document.getElementById('chartsContainer');
 const loginForm = document.getElementById('loginForm');
 const errorP = document.getElementById('error');
-const filtroCiudad = document.getElementById('filtroCiudad'); // filtro
+const filtroCiudad = document.getElementById('filtroCiudad'); 
 let chart; // referencia al gráfico
 let datosCompletos = []; // para filtrar sin volver a fetch
 
-// ===== LOGIN =====
+//LOGIN 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
 
   try {
-    // 🔹 Login local
-    const res = await fetch('http://localhost:7000/login', {
+    // login
+    const res = await fetch('https://auth-12mf.onrender.com/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -36,11 +36,11 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ===== FUNCIONES PARA GRÁFICO =====
+//FUNCIONES PARA GRÁFICO 
 async function fetchTemperaturas() {
   const token = localStorage.getItem('token');
 
-  // 🔹 Fetch desde REST API en Render
+  // Fetch desde REST API en Render
   const response = await fetch('https://rest-api-db.onrender.com/temperatura_api', {
     headers: { Authorization: `Bearer ${token}` }
   });
@@ -53,7 +53,7 @@ async function fetchTemperaturas() {
   return data;
 }
 
-// Preparar datasets para Chart.js
+// datasets para Chart.js
 function prepararDatos(data) {
   const cities = ['Shangai', 'Berlin', 'Rio de Janeiro'];
   const colores = {
@@ -70,7 +70,7 @@ function prepararDatos(data) {
     borderColor: colores[city],
     fill: false,
     tension: 0.1
-  })).filter(ds => ds.data.length > 0); // solo datasets con datos
+  })).filter(ds => ds.data.length > 0); 
 }
 
 // Actualizar KPIs
@@ -96,14 +96,14 @@ function actualizarKPIs(data) {
 async function crearGrafico() {
   try {
     const data = await fetchTemperaturas();
-    datosCompletos = data; // guardamos todo
+    datosCompletos = data; 
 
     const ciudadSeleccionada = filtroCiudad.value;
     const dataFiltrada = ciudadSeleccionada === 'all'
       ? data
       : data.filter(d => d.city === ciudadSeleccionada);
 
-    // 🔹 KPIs según filtro
+    // KPIs según filtro
     actualizarKPIs(dataFiltrada);
 
     const datasets = prepararDatos(dataFiltrada);
@@ -134,12 +134,12 @@ async function crearGrafico() {
   }
 }
 
-// ===== FILTRO =====
+// FILTRO 
 filtroCiudad.addEventListener('change', () => {
   crearGrafico(); // usa datosCompletos y aplica filtro
 });
 
-// ===== AUTOLOGIN SI YA HAY TOKEN =====
+// AUTOLOGIN SI YA HAY TOKEN 
 function isTokenValid(token) {
   if (!token) return false;
   try {

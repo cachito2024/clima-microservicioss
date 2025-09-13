@@ -1,104 +1,4 @@
-/* const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-
-const app = express();
-app.use(bodyParser.json());
-
-app.post('/webhook', async (req, res) => {
-  console.log('📥 Webhook recibió datos:', req.body);
-
-  // Reenviar al REST API (punto 4)
-  try {
-    const response = await axios.post('http://localhost:4000/temperatura_api', req.body);
-    console.log('📤 Webhook reenviando datos al REST API (punto 4):', response.data);
-  } catch (err) {
-    console.error('⚠️ Error reenviando al REST API:', err.response?.data || err.message);
-  }
-
-  res.status(200).send({ message: '✅ Webhook procesó los datos correctamente' });
-});
-
-app.listen(3000, () => {
-  console.log('✅ Webhook escuchando en http://localhost:3000/webhook');
-});
- */
-//renderr 
-/* require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-
-const app = express();
-app.use(bodyParser.json());
-
-// Health check para Render
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// Endpoint principal del Webhook
-app.post('/webhook', async (req, res) => {
-  console.log('📥 Webhook recibió datos:', req.body);
-
-  try {
-    const response = await axios.post(process.env.REST_API_URL, req.body);
-    console.log('📤 Webhook → REST API:', response.data);
-  } catch (err) {
-    console.error('⚠️ Error reenviando al REST API:', err.response?.data || err.message);
-  }
-
-  res.status(200).send({ message: '✅ Webhook procesó los datos correctamente' });
-});
-
-// Usar el puerto asignado por Render
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Webhook escuchando en http://localhost:${PORT}/webhook`);
-});
- */
-//CON JWT
-/* require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
-
-const app = express();
-app.use(bodyParser.json());
-
-// Health check para Render
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-
-// Endpoint principal del Webhook 
-app.post('/webhook',    async (req, res) => {
-  console.log('📥 Webhook recibió datos:', req.body);
-
-  try {
-    const response = await axios.post(process.env.REST_API_URL, req.body, {
-      headers: {
-        Authorization: `Bearer ${req.headers["authorization"].split(" ")[1]}`
-      }
-    });
-    console.log('📤 Webhook → REST API:', response.data);
-  } catch (err) {
-    console.error('⚠️ Error reenviando al REST API:', err.response?.data || err.message);
-  }
-
-  res.status(200).send({ message: '✅ Webhook procesó los datos correctamente' });
-});
-
-// Usar el puerto asignado por Render
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Webhook escuchando en http://localhost:${PORT}/webhook`);
-});
- */
-
-//moddd para auth
+//WEBHOOK
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -113,38 +13,74 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// Endpoint principal del Webhook 
+//  Funciones de backoff 
+const BASE_MS = 1000;   // 1s
+const MAX_MS = 60_000;  // 60s
+function msBackoffTry(n) {
+  const exp = Math.min(MAX_MS, BASE_MS * Math.pow(2, n));
+  return Math.round(exp * (0.5 + Math.random())); // jitter
+}
+
+//  Función robusta para reenviar con retry 
+async function forwardToRestAPI(data, token) {
+  let attempt = 0;
+  while (attempt < 5) { // máx 5 intentos
+    try {
+      const response = await axios.post(process.env.REST_API_URL, data, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 15000
+      });
+      console.log('📤 Webhook → REST API:', response.data);
+      return response.data; // éxito
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 429) {
+        // Too Many Requests → aplicar retry-after o backoff
+        const ra = err.response?.headers?.['retry-after'];
+        let delay = msBackoffTry(attempt);
+        if (ra) {
+          const parsed = parseInt(ra, 10);
+          if (!Number.isNaN(parsed)) delay = Math.max(parsed * 1000, BASE_MS);
+        }
+        console.warn(`⚠️ REST API respondió 429. Reintentando en ${delay / 1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+        attempt++;
+      } else {
+        // Otros errores → no reintentar
+        throw err;
+      }
+    }
+  }
+  throw new Error("Máximos intentos al REST API alcanzados (429 persistente).");
+}
+
+// Endpoint 
 app.post('/webhook', async (req, res) => {
   console.log('📥 Webhook recibió datos:', req.body);
 
-  // Obtener token del header de manera segura
+  // Obtener token del header 
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ error: "No se proporcionó token" });
   }
 
-  // Opcional: verificar token localmente si querés (no necesario si REST API lo valida)
-  try {
+    try {
     jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     return res.status(403).json({ error: "Token inválido" });
   }
 
-  try {
-    const response = await axios.post(process.env.REST_API_URL, req.body, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    console.log('📤 Webhook → REST API:', response.data);
+ try {
+    //función con retry/backoff
+    const response = await forwardToRestAPI(req.body, token);
     res.status(200).json({ message: '✅ Webhook procesó los datos correctamente' });
   } catch (err) {
-    console.error('⚠️ Error reenviando al REST API:', err.response?.data || err.message);
+    console.error('⚠️ Error reenviando al REST API:', err.message);
     res.status(500).json({ error: 'Error al reenviar al REST API', details: err.message });
   }
 });
 
-// Usar el puerto asignado por Render
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Webhook escuchando en http://localhost:${PORT}/webhook`);
