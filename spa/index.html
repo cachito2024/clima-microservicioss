@@ -31,7 +31,17 @@
     <div class="title-container">
       <h1 class="charts-title">Temperaturas por Ciudad</h1>
     </div>
-
+ <!-- Filtro ciudad -->
+    <div id="filtro" class="filtro-container">
+      <label for="filtroCiudad">Filtrar ciudad</label>
+      <select id="filtroCiudad">
+        <option value="all">Todas</option>
+        <option value="Shangai">Shangai</option>
+        <option value="Berlin">Berlin</option>
+        <option value="Rio de Janeiro">Rio de Janeiro</option>
+      </select>
+    </div>
+    
     <!-- KPIs en recuadros -->
     <div id="kpis" class="kpis-container">
       <div class="kpi-card">Total datos: <b id="totalDatos">0</b></div>
@@ -42,16 +52,7 @@
       <div class="kpi-card">Min: <b id="tempMin">0</b>°C</div>
     </div>
 
-    <!-- Filtro ciudad -->
-    <div id="filtro" class="filtro-container">
-      <label for="filtroCiudad">Filtrar ciudad:</label>
-      <select id="filtroCiudad">
-        <option value="all">Todas</option>
-        <option value="Shangai">Shangai</option>
-        <option value="Berlin">Berlin</option>
-        <option value="Rio de Janeiro">Rio de Janeiro</option>
-      </select>
-    </div>
+   
 
     <!-- Gráfico -->
     <canvas id="tempChart" width="800" height="400"></canvas>

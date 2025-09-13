@@ -1,4 +1,3 @@
-/* Body general */
 body {
   font-family: Arial, sans-serif;
   margin: 40px;
@@ -6,8 +5,10 @@ body {
   color: #333;
   text-align: center;
   background-image: url(./4066.jpg);
-  background-repeat: repeat;           /* se repite tanto horizontal como vertical */
+  background-repeat: repeat;           
 background-size: 500px;
+ background-color: rgba(255,255,255,0.5); /* capa blanca semi-transparente */
+  background-blend-mode: lighten; /* combina color con imagen */
 
 }
 
@@ -32,7 +33,7 @@ h1::before {
   bottom: 0.2em; /* ajusta altura del resaltador */
   width: 100%;
   height: 1em;    /* grosor del resaltador */
-  background: rgba(23, 224, 90, 0.212); /* amarillo semi-transparente */
+ /*  background: rgba(23, 224, 90, 0.212); /* amarillo semi-transparente */
   z-index: -1; /* queda detrás del texto */
   border-radius: 3px;
  
@@ -46,11 +47,12 @@ h1::before {
 /* Canvas del gráfico */
 canvas#tempChart {
   background-color: #fff;
-  border: 1px solid #ccc;
+  border: 1.5px solid #1069e6;
   box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-  margin: auto;
+ margin: 40px auto 0 auto;
   display: block;
   padding: 20px;
+  border-style:dashed;
 }
 
 /* KPIs */
@@ -63,8 +65,9 @@ canvas#tempChart {
 /* Filtro de ciudad */
 .filtro-container {
   margin-bottom: 20px;
-  text-align: center;
+  text-align:left;
   font-size: 16px;
+  margin-left: 80px;
 }
 
 .filtro-container label {
@@ -108,8 +111,9 @@ canvas#tempChart {
   background-color: #fff;
   border: 1px solid #ccc;
   padding: 15px 20px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.747);
   border-radius: 8px;
+  border-color: black;
   min-width: 120px;
   font-size: 16px;
   font-weight: bold;
@@ -206,7 +210,7 @@ canvas#tempChart {
 .title-container {
   display: inline-block;          /* ajusta ancho al contenido */
   padding: 20px 40px;             /* espacio interno, similar al login */
-  background: #ffffffa1;          /* fondo semi-transparente */
+  background: #1345eb86;          /* fondo semi-transparente */
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   margin-bottom: 25px;            /* espacio con KPIs */
@@ -219,7 +223,7 @@ canvas#tempChart {
 .charts-title {
   font-size: 28px;
   font-weight: bold;
-  background: linear-gradient(45deg, #215cff, #af06fd);
+  background: linear-gradient(45deg, #4e13f0c9, #01050a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
