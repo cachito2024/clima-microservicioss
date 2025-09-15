@@ -1,5 +1,4 @@
 // rest-api.js
-require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors'); 
@@ -25,13 +24,10 @@ app.get('/debug/egress-ip', async (_req, res) => {
 });
 
 // ======= Mongo =======
-mongoose.set('bufferCommands', false); // no buferizar si no hay conexión
+mongoose.set('bufferCommands', false);
 
-const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI; // acepta ambos nombres
-if (!mongoUri) {
-  console.error('❌ Falta MONGODB_URI/MONGO_URI en .env');
-  process.exit(1);
-}
+// 🚨 URI HARDCODEADA (no lee de .env)
+const mongoUri = "mongodb+srv://antonella:programo2025a@cluster0.qxz4vxb.mongodb.net/Clima?retryWrites=true&w=majority&appName=Cluster0";
 
 // Schema y modelo
 const temperaturaSchema = new mongoose.Schema({
@@ -46,14 +42,14 @@ const TemperaturaAPI = mongoose.model('TemperaturaAPI', temperaturaSchema, 'temp
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || "secreto123", (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
     next();
   });
 }
 
-// POST (protegido; si no querés protegerlo, quitá el middleware)
+// POST
 app.post('/temperatura_api', authenticateToken, async (req, res) => {
   try {
     const payload = req.body;
@@ -61,12 +57,6 @@ app.post('/temperatura_api', authenticateToken, async (req, res) => {
 
     if (!Array.isArray(payload)) {
       return res.status(400).json({ error: 'Se esperaba un array de objetos' });
-    }
-    // validación mínima
-    for (const it of payload) {
-      if (typeof it.city !== 'string' || typeof it.temperature !== 'number' || !it.timestamp) {
-        return res.status(400).json({ error: 'Campos inválidos en el array' });
-      }
     }
 
     const result = await TemperaturaAPI.insertMany(payload, { ordered: false });
@@ -89,15 +79,14 @@ app.get('/temperatura_api', authenticateToken, async (_req, res) => {
   }
 });
 
-// ======= Boot: conectar primero y recién después listen =======
+// ======= Boot =======
 const PORT = process.env.PORT || 4000;
 
 async function boot() {
   try {
     await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 60000, // hasta 60s para seleccionar nodo
+      serverSelectionTimeoutMS: 60000,
       socketTimeoutMS: 120000,
-      // useNewUrlParser / useUnifiedTopology ya no son necesarios en Mongoose 7/8
     });
     console.log('✅ Conectado a MongoDB Atlas');
     app.listen(PORT, () => {
