@@ -65,7 +65,7 @@ app.post('/temperatura_api',  async (req, res) => {
 });
 
 // GET
-app.get('/temperatura_api', authenticateToken, async (req, res) => {
+app.get('/temperatura_api', /* authenticateToken */ async (req, res) => {
   try {
     const data = await TemperaturaAPI.find().sort({ timestamp: 1 });
     res.json(data);
