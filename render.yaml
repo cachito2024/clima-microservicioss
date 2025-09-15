@@ -8,9 +8,9 @@ services:
     startCommand: "node rest-api-db.js"
     envVars:
       - key: MONGO_URI
-        value: mongodb+srv://antonella:1234@cluster0.qxz4vxb.mongodb.net/Clima?retryWrites=true&w=majority&appName=Cluster0
+        sync: false
       - key: REST_API_URL
-        value: https://rest-api-db.onrender.com/temperatura_api
+        sync: false
 
   - type: web
     name: webhook
@@ -21,9 +21,9 @@ services:
     startCommand: "node webhook-server.js"
     envVars:
       - key: REST_API_URL
-        value: https://rest-api-db.onrender.com/temperatura_api
+        sync: false
       - key: WEBHOOK_URL
-        value: https://webhook-k8gk.onrender.com/webhook
+        sync: false
 
   - type: web
     name: ws-server
@@ -45,9 +45,9 @@ services:
     startCommand: "node ws-client.js"
     envVars:
       - key: WS_SERVER_URL
-        value: wss://ws-server-pa1h.onrender.com
+        sync: false
       - key: WEBHOOK_URL
-        value: https://webhook-k8gk.onrender.com/webhook
+        sync: false
 
   - type: web
     name: auth
@@ -58,4 +58,4 @@ services:
     startCommand: "node auth.js"
     envVars:
       - key: JWT_SECRET
-        value: miclavesupersegura
+        sync: false
