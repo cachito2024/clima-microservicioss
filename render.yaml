@@ -34,7 +34,7 @@ services:
     startCommand: "node ws-server.js"
     envVars:
       - key: WEBHOOK_URL
-        value: https://webhook-k8gk.onrender.com/webhook
+        sync: false
 
   - type: web
     name: ws-client
