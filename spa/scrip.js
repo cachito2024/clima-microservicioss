@@ -41,7 +41,7 @@ async function fetchTemperaturas() {
   const token = localStorage.getItem('token');
 
   // Fetch desde REST API en Render
-  const response = await fetch('https://rest-api-db.onrender.com/temperatura_api', {
+  const response = await fetch(/* 'https://rest-api-db.onrender.com/temperatura_api' */'http://localhost:4000/temperatura_api', {
     headers: { Authorization: `Bearer ${token}` }
   });
 
